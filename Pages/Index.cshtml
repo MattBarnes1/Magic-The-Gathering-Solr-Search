@@ -1,0 +1,72 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Search";
+}
+
+
+@if (Model.myModel != null && Model.myModel.SearchItemError != null)
+{
+<p />
+<p />
+<p />
+<p />
+<label>@Model.myModel.SearchItemError</label>
+
+}
+<div id="typeahead">
+
+@if (Model.myModel != null)
+{
+    @foreach (var CardInfo in Model.myModel.CardInfoList)
+    {
+    <div class="card mx-auto" style="width: 100rem;">
+        <img class="card-img-top" src="..." alt="">
+        <div class="card-body">
+            <h5 class="card-title">@CardInfo.name[0]</h5>
+            <p class="card-text">
+                @if (CardInfo.colorIdentity != null && CardInfo.colorIdentity.Count > 0)
+                {
+                    <label>Color Identity:</label> @CardInfo.colorIdentity[0]
+                }
+            <p />
+            @if (CardInfo.colors != null && CardInfo.colors.Count > 0)
+            {
+                <label>Colors:</label>@CardInfo.colors[0]<p />
+            }
+            <label>Converted Mana Cost:</label>@CardInfo.convertedManaCost[0]<p />
+            <label>Layout:</label>@CardInfo.layout[0]<p />
+            @if (CardInfo.manacost != null && CardInfo.manacost.Count > 0)
+            {
+                <label>Mana Cost:</label>@CardInfo.manacost[0]<p />
+            }
+            @if (@CardInfo.printings.Count != 0)
+            {
+                <label>Printings:</label>
+                @foreach (String A in @CardInfo.printings)
+                {
+                    @A
+                }
+                <p />
+            }
+            <label>Oracle ID:</label>@CardInfo.scryfallOracleId[0]<p />
+            <label>Description:</label>  @CardInfo.text[0]<p />
+            <label>Type:</label>  @CardInfo.type[0]<p />
+            <label>Types:</label>  @CardInfo.types[0]<p />
+            <label>Unique ID:</label>  @CardInfo.uuid[0]<p />
+            <label>ID:</label>  @CardInfo.id<p />
+            @if (CardInfo.version != null)
+            {
+                <label>Version:</label> @CardInfo.version<p />
+            }
+
+
+            </p>
+            <hr />
+        </div>
+    </div>
+
+    }
+}
+</div>
+

@@ -1,0 +1,176 @@
+﻿<!DOCTYPE html>
+<html>
+<environment include="Development">
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+</environment>
+<environment exclude="Development">
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.3.1.min.js"
+            asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+            asp-fallback-test="window.jQuery"
+            crossorigin="anonymous"
+            integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
+            asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
+            asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+            crossorigin="anonymous"
+            integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd">
+    </script>
+    <script src="~/js/site.min.js" asp-append-version="true"></script>
+</environment>
+@Html.AntiForgeryToken()
+<script>
+    function CheckChanges(typedstring) {
+        var myAjax = $.ajax({
+            url: './Index?handler=TypeAheadImplementation',
+            type: 'POST',
+            data: { QueryType : $('input:hidden[name="QueryType"]').val(), typedstring },
+            headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+        });
+        myAjax.done(function (result) {
+            var ResultsText = "";
+            $("#typeahead").html("");
+            var Iter = 3;
+            if (result.length < 3) {
+                Iter = result.length;
+            }
+
+            for (i = 0; i < Iter; i++) {
+                ResultsText += "<div class=\"card mx-auto\" style=\"width: 100rem;\">";
+                ResultsText += "<img class=\"card-img-top\" src=\"...\" alt=\"\">";
+                ResultsText += "<div class=\"card-body\">";
+                ResultsText += "<h5 class=\"card-title\">" + result[i]['name'] + "</h5>";
+                ResultsText += "<p class=\"card-text\">";
+                if(typeof result[i]['colorIdentity'] !== 'undefined' && result[i]['colorIdentity'] != null)
+                    ResultsText += "<label>Color Identity:</label>" + result[i]['colorIdentity'][0];
+                ResultsText += "<p />";
+                if(typeof result[i]['colors'] !== 'undefined' && result[i]['colors'] != null)
+                    ResultsText += "<label>Colors:</label>" + result[i]['colors'][0]+ "<p />";
+                ResultsText += "<label>Converted Mana Cost:</label>" + result[i]['convertedManaCost'][0] + "<p />";
+                if(typeof result[i]['layout'] !== 'undefined' && result[i]['layout'] != null)
+                    ResultsText += "<label>Layout:</label>" + result[i]['layout'][0] + "<p />";
+                if(typeof result[i]['manacost'] !== 'undefined' && result[i]['manacost'] != null)
+                    ResultsText += "<label>Mana Cost:</label>" + result[i]['manacost'][0] + "<p />";
+                ResultsText += "<label>Printings:</label>";
+                ResultsText += "<p />";
+                if(typeof result[i]['scryfallOracleId'] !== 'undefined' && result[i]['scryfallOracleId'] != null)
+                    ResultsText += "<label>Oracle ID:</label>" + result[i]['scryfallOracleId'][0] + "<p />";
+                if(typeof result[i]['text'] !== 'undefined' && result[i]['text'] != null)
+                    ResultsText += "<label>Description:</label>" +   result[i]['text'][0] + "<p />";
+                if(typeof result[i]['type'] !== 'undefined' && result[i]['type'] != null)
+                    ResultsText += "<label>Type:</label>" +   result[i]['type'][0] + "<p />";
+                if(typeof result[i]['types'] !== 'undefined' && result[i]['types'] != null)
+                    ResultsText += "<label>Types:</label>" +  result[i]['types'][0] + "<p />";
+                if(typeof result[i]['uuid'] !== 'undefined' && result[i]['uuid'] != null)
+                    ResultsText += "<label>Unique ID:</label>" +   result[i]['uuid'][0] + "<p />";
+                ResultsText += "<label>ID:</label>" + result[i]['id'] + "<p />";
+                if(result[i]['version'] != null)
+                    ResultsText += "<label>Version:</label>" +   result[i]['version'] + "<p />";
+            }
+            $("#typeahead").html(ResultsText);
+        });
+    }
+
+
+</script>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Magic The Gathering - @ViewData["Title"]</title>
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    </environment>
+</head>
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a asp-page="/Index" class="navbar-brand">Magic The Gathering Search</a>
+            </div>
+            <div class="col-sm-4 col-md-4 pull-right">
+                <form class="navbar-form" role="search" method="post" asp-page="/Index" asp-route-usr="" asp-page-handler="Search" id="InternalSearch">
+                    <input type="hidden" name="QueryType" value=""/>
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="SearchTypeName">Name:</button>
+                            <div class="dropdown-menu">
+                                @foreach(var A in Model.AllowedItems)
+                                {
+                                <a class="dropdown-item input-group-addon" onclick="return DropDownNameChange('@A')" href="#">@A</a>
+                                <div role="separator" class="dropdown-divider"></div>
+                                }
+                            <a class="dropdown-item input-group-addon" onclick="return DropDownNameChange('Raw')" href="#">Raw</a>
+                                <div role="separator" class="dropdown-divider"></div>
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Search" id="usr" onkeydown="return onKey(event)" onkeypress="return Typeahead(event)">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" type="button" onclick="return OnClick()"></i>Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+    $('document').load($('input[name="QueryType"]').val("Name"))
+    function DropDownNameChange(SelectedItem) {
+        document.getElementById('SearchTypeName').innerHTML = SelectedItem + ":";
+        $('input[name="QueryType"]').val(SelectedItem);
+        document.getElementById('typeahead').innerHTML = "";
+        document.getElementById('usr').value = "";
+    }
+
+        function onKey(event) {
+        var key = event.keyCode || event.charCode;
+
+            if (key == 8 || key == 46) {
+                if (typeof document.getElementById('usr').value !== 'undefined' && document.getElementById('usr').value != null) {
+                    if (document.getElementById('usr').value.length > 1) {
+                        var avalue = document.getElementById('usr').value;
+                    CheckChanges(avalue.substring(0, avalue.length-1));
+                } else {
+                    document.getElementById('typeahead').innerHTML = "";
+                    }
+                }
+            }
+            return true;
+        };
+        function OnClick() {
+            var myValue = document.getElementById('InternalSearch');
+            myValue.action = "/?usr=" + document.getElementById('usr').value + "&handler=Search&QueryType=" + $('input[name="QueryType"]').val();
+            document.getElementById('usr').value = "";
+            myValue.submit();
+        }
+
+        function Typeahead(event) {
+            CheckChanges(document.getElementById('usr').value + String.fromCharCode(event.which));
+        }
+    </script>
+
+    <div class="container body-content">
+        @RenderBody()
+    </div>
+
+
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
